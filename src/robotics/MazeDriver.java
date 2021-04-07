@@ -1,3 +1,6 @@
+package robotics;
+import java.io.IOException;
+
 import lejos.hardware.Button;
 import lejos.hardware.Key;
 import lejos.hardware.KeyListener;
@@ -12,8 +15,18 @@ import lejos.robotics.chassis.Wheel;
 import lejos.robotics.chassis.WheeledChassis;
 import lejos.robotics.navigation.MovePilot;
 import lejos.robotics.subsumption.*;
+import maze.MazeStore;
+import subsumption.MoveForward;
+import subsumption.TurnLeft;
+import subsumption.TurnRight;
 
+/**
+ * A class used to control the movement of the EV3 through a maze.
+ * 
+ * @author Jacob Clayden (<a href="https://github.com/jacobcxdev">@jacobcxdev</a>)
+ */
 public class MazeDriver {
+	// Private Fields
 
 	/**
 	 * The diameter of the EV3's wheels (in millimetres).
@@ -61,6 +74,11 @@ public class MazeDriver {
 	private Wheel rightWheel = WheeledChassis.modelWheel(new EV3LargeRegulatedMotor(MotorPort.B), WHEEL_DIAMETER).offset(WHEEL_OFFSET);
 	
 	/**
+	 * The {@code GyroWheeledChassis} used for controlling the wheels.
+	 */
+	private GyroWheeledChassis chassis;
+	
+	/**
 	 * The {@code Pilot} used for controlling the movement of the EV3.
 	 */
 	private MovePilot pilot;
@@ -75,6 +93,8 @@ public class MazeDriver {
 	 */
 	private Arbitrator arbitrator;
 	
+	// Public Constructors
+	
 	/**
 	 * Creates a {@code MazeDriver} object.
 	 * 
@@ -83,28 +103,42 @@ public class MazeDriver {
 	public MazeDriver(MazeStore mazeStore) {
 		store = mazeStore;
 		
-		// Set up chassis and pilot.
-		GyroWheeledChassis chassis = new GyroWheeledChassis(new Wheel[] {leftWheel, rightWheel}, WheeledChassis.TYPE_DIFFERENTIAL, gyroSensor, gyroOrientation);
-		pilot = new MovePilot(chassis);
-		pilot.setAngularSpeed(10); // Set the angular speed to a low speed so that the angular momentum of the EV3 doesn't affect its ability to stop after rotating a desired angle too much.
-		
-		// Set up behaviours and arbitrator.
-		arbitrator = new Arbitrator(new Behavior[] { // Create `Arbitrator` to manage behaviours.
-			new MoveForward(pilot, store), // Move forward.
-			new Centre(pilot, leftUltrasonicSensor, rightUltrasonicSensor), // Centre if needed.
-			new TurnRight(pilot, store, touchSensor), // Turn right if needed.
-			new TurnLeft(pilot, store, leftUltrasonicSensor) // Turn left if possible.
-		});
-		
 		// Set up buttons.
 		Button.ESCAPE.addKeyListener(new KeyListener() {
 			public void keyPressed(Key k) {}
 			
 			public void keyReleased(Key k) {
+				arbitrator.stop();
+				stop();
+				while (pilot.isMoving()) {}
+				try {
+					store.constructLineMap().createSVGFile("maze.svg");
+				} catch (IOException e) {
+					System.err.println(e.getLocalizedMessage());
+				}
 				System.exit(0); // Exit.
 			}
 		});
+		
+		// Set up the chassis.
+		chassis = new GyroWheeledChassis(new Wheel[] {leftWheel, rightWheel}, WheeledChassis.TYPE_DIFFERENTIAL, gyroSensor, gyroOrientation);
+		chassis.calibrateGyroSensor();
+		
+		// Set up the pilot.
+		pilot = new MovePilot(chassis);
+		pilot.addMoveListener(mazeStore);
+		pilot.setAngularSpeed(10); // Set the angular speed to a low speed so that the angular momentum of the EV3 doesn't affect its ability to stop after rotating a desired angle too much.
+		pilot.setLinearSpeed(100); // Set the linear speed to a low speed so that the linear momentum of the EV3 doesn't affect its ability to stop, causing it to overshoot turns.
+		
+		// Set up behaviours and arbitrator.
+		arbitrator = new Arbitrator(new Behavior[] { // Create `Arbitrator` to manage behaviours.
+			new MoveForward(this), // Move forward.
+			new TurnRight(this, touchSensor), // Turn right if needed.
+			new TurnLeft(this, leftUltrasonicSensor) // Turn left if possible.
+		});
 	}
+	
+	// Public Methods
 	
 	/**
 	 * Starts the {@code MazeDriver} by invoking the {@code Arbitrator}.<br/><br/>
@@ -114,20 +148,49 @@ public class MazeDriver {
 	public void go() {
 		arbitrator.go();
 	}
-
+	
+	// Pilot Wrapper Methods
+	
 	/**
-	 * The main method which is invoked by the EV3's JVM.
-	 * 
-	 * @param args The {@code String} arguments passed to the program.
+	 * Moves the EV3 forward.
 	 */
-	public static void main(String[] args) {
-		MazeStore mazeStore = new MazeStore();
-		MazeDriver driver = new MazeDriver(mazeStore);
-		driver.go();
+	public void forward() {
+		pilot.forward();
+	}
+	
+	/**
+	 * Rotates the EV3 a given angle.
+	 * 
+	 * @param angle The angle to rotate in degrees.
+	 * @param shouldStore Whether the movement should be stored (performed by the {@code MovePilot} vs. the chassis).
+	 */
+	public void rotate(double angle, boolean shouldStore) {
+		if (shouldStore) {
+			pilot.rotate(angle);
+		} else {
+			chassis.rotate(angle);
+		}
+	}
+	
+	/**
+	 * Stops the EV3.
+	 */
+	public void stop() {
+		pilot.stop();
+	}
+	
+	/**
+	 * Makes the EV3 travel a given distance.
+	 * 
+	 * @param distance The distance to travel.
+	 * @param shouldStore Whether the movement should be stored (performed by the {@code MovePilot} vs. the chassis).
+	 */
+	public void travel(double distance, boolean shouldStore) {
+		if (shouldStore) {
+			pilot.travel(distance);
+		} else {
+			chassis.travel(distance);
+		}
 	}
 
 }
-
-// TODO: MazeReader class which reads the maze into a series of movements to be performed.
-// TODO: Web server.
-// TODO: Finish implementing MazeStore (see MazeStore.java for more).
