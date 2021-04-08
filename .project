@@ -11,6 +11,14 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
+<<<<<<< Updated upstream
+=======
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+>>>>>>> Stashed changes
 			<name>org.lejos.ev3.ldt.leJOSEV3Builder</name>
 			<arguments>
 			</arguments>
@@ -18,6 +26,10 @@
 	</buildSpec>
 	<natures>
 		<nature>org.lejos.ev3.ldt.leJOSEV3Nature</nature>
+<<<<<<< Updated upstream
+=======
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+>>>>>>> Stashed changes
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>
