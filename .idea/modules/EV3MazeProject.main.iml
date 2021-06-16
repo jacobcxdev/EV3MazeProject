@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.system.module.type="sourceSet" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/../../build/classes/java/main" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../src/main">
+      <sourceFolder url="file://$MODULE_DIR$/../../src/main/java" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.github.ev3dev-lang-java:ev3dev-lang-java:2.6.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.mindstorms-cop:lejos-ev3-gradle-plugin:0.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.mindstorms-cop.lejos-ev3-maven-packages:ev3classes:0.9.1-beta.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.socket:socket.io-server:3.0.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.socket:socket.io-client:2.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.ev3dev-lang-java:lejos-commons:0.7.3" level="project" />
+    <orderEntry type="library" name="Gradle: net.java.dev.jna:jna:4.5.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.jcraft:jsch:0.1.53" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.mindstorms-cop.lejos-ev3-maven-packages:dbusjava:0.9.1-beta.1" level="project" />
+    <orderEntry type="library" name="Gradle: io.socket:engine.io-server:4.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: io.socket:engine.io-client:2.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.json:json:20190722" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.12.12" level="project" />
+    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.15.0" level="project" />
+  </component>
+</module>
